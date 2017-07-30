@@ -4,8 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.easefun.polyvsdk.activity.PolyvPlayerView
-        android:id="@+id/iv_play"
+
+        <com.easefun.polyvsdk.activity.PolyvPlayerView
+            android:id="@+id/iv_play"
+            android:layout_width="match_parent"
+            android:layout_height="180dp" />
+
+
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="100dp"
+        android:src="@color/top_left_layout_color_black_alpha" />
 </LinearLayout>

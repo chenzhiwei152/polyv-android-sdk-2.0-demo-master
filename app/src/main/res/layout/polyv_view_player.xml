@@ -1,14 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/view_layout"
     android:orientation="vertical">
 
 
     <RelativeLayout
-        android:id="@+id/view_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/top_center_player_height"
+        android:layout_height="match_parent"
         android:background="@color/top_text_color_black">
 
         <com.easefun.polyvsdk.video.PolyvVideoView
@@ -127,4 +127,4 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>

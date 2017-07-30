@@ -9,6 +9,7 @@ import android.content.res.TypedArray;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,9 +23,6 @@ import android.widget.Toast;
 import com.easefun.polyvsdk.PolyvSDKUtil;
 import com.easefun.polyvsdk.R;
 import com.easefun.polyvsdk.fragment.PolyvPlayerDanmuFragment;
-import com.easefun.polyvsdk.fragment.PolyvPlayerTabFragment;
-import com.easefun.polyvsdk.fragment.PolyvPlayerTopFragment;
-import com.easefun.polyvsdk.fragment.PolyvPlayerViewPagerFragment;
 import com.easefun.polyvsdk.player.PolyvPlayerAuditionView;
 import com.easefun.polyvsdk.player.PolyvPlayerAuxiliaryView;
 import com.easefun.polyvsdk.player.PolyvPlayerLightView;
@@ -73,9 +71,6 @@ import java.net.URL;
 public class PolyvPlayerView extends LinearLayout {
 
     private static final String TAG = PolyvPlayerActivity.class.getSimpleName();
-    private PolyvPlayerTopFragment topFragment;
-    private PolyvPlayerTabFragment tabFragment;
-    private PolyvPlayerViewPagerFragment viewPagerFragment;
     private PolyvPlayerDanmuFragment danmuFragment;//弹幕
     /**
      * 播放器的parentView
@@ -146,13 +141,17 @@ public class PolyvPlayerView extends LinearLayout {
     //播放模式
     private int playModeCode;
 
-    private String vid="c538856ddeb0abe3b875545932c82c59_c";//视频编号
+    private String vid = "";//视频编号
 
     private int bitrate;//比特率
 
     private boolean isMustFromLocal = false;
 
+    private boolean startNow;//是否立即开始播放
+
     private Activity activity;
+
+    private FragmentTransaction transaction;
 
     public PolyvPlayerView(Context context) {
         super(context);
@@ -169,39 +168,63 @@ public class PolyvPlayerView extends LinearLayout {
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.polyvPlayerView);
-            playModeCode = ta.getInt(R.styleable.polyvPlayerView_playModeCode, 3);
-            boolean startNow = ta.getBoolean(R.styleable.polyvPlayerView_startNow, false);
+            playModeCode = ta.getInt(R.styleable.polyvPlayerView_playModeCode, 4);
+            startNow = ta.getBoolean(R.styleable.polyvPlayerView_startNow, false);
+        }
+        View.inflate(context, R.layout.polyv_view_player, this);
 
 
-            PlayMode playMode = PlayMode.getPlayMode(playModeCode);
-            if (playMode == null)
-                playMode = PlayMode.portrait;
+
+        PlayMode playMode = PlayMode.getPlayMode(playModeCode);
+        if (playMode == null)
+            playMode = PlayMode.portrait;
 //            String vid = getIntent().getStringExtra("value");
 //            int bitrate = getIntent().getIntExtra("bitrate", PolyvBitRate.ziDong.getNum());//比特率
 
 //            boolean isMustFromLocal = getIntent().getBooleanExtra("isMustFromLocal", false);//不知道是啥
 
-            switch (playMode) {
-                case landScape:
-                    mediaController.changeToLandscape();
-                    break;
-                case portrait:
-                    mediaController.changeToPortrait();
-                    break;
-            }
 
-            play(vid, bitrate, startNow, isMustFromLocal);
-        }
-        View.inflate(context, R.layout.polyv_view_player, this);
-
-        findIdAndNew();
-        initView();
-        addFragment();
     }
+
+    /**
+     * 设置视频播放地址
+     *
+     * @return
+     */
+    public String getVid() {
+        return vid;
+    }
+
+    public void setVid(String vid) {
+        this.vid = vid;
+        play(vid, bitrate, startNow, isMustFromLocal);
+    }
+
+    public int getPlayModeCode() {
+        return playModeCode;
+    }
+
+    /**
+     * 设置播放方向
+     * @param playModeCode
+     */
+    public void setPlayModeCode(int playModeCode) {
+        switch (playModeCode) {
+            case 3:
+                mediaController.changeToLandscape();
+                break;
+            case 4:
+                mediaController.changeToPortrait();
+                break;
+        }
+        this.playModeCode = playModeCode;
+    }
+
+
     private void addFragment() {
         danmuFragment = new PolyvPlayerDanmuFragment();
-//        FragmentTransaction ft = context.getSupportFragmentManager().beginTransaction();
-//        ft.add(R.id.fl_danmu,danmuFragment,"danmuFragment");
+//        FragmentTransaction ft =getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.fl_danmu,danmuFragment,"danmuFragment");
         // 网校的在线视频才添加下面的控件
 //        if (!getIntent().getBooleanExtra(PolyvMainActivity.IS_VLMS_ONLINE, false)) {
 //            ft.commit();
@@ -214,8 +237,28 @@ public class PolyvPlayerView extends LinearLayout {
 //        ft.add(R.id.fl_top, topFragment, "topFragmnet");
 //        ft.add(R.id.fl_tab, tabFragment, "tabFragment");
 //        ft.add(R.id.fl_viewpager, viewPagerFragment, "viewPagerFragment");
-//        ft.commit();
+        transaction.commit();
     }
+
+    public FragmentTransaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(FragmentTransaction transaction) {
+        this.transaction = transaction;
+        addFragment();
+        findIdAndNew();
+        initView();
+        switch (playModeCode) {
+            case 3:
+                mediaController.changeToLandscape();
+                break;
+            case 4:
+                mediaController.changeToPortrait();
+                break;
+        }
+    }
+
     private void findIdAndNew() {
         viewLayout = (RelativeLayout) findViewById(R.id.view_layout);
         videoView = (PolyvVideoView) findViewById(R.id.polyv_video_view);
@@ -748,12 +791,14 @@ public class PolyvPlayerView extends LinearLayout {
         volumeView.hide();
         lightView.hide();
     }
-    public void stop(){
+
+    public void stop() {
         //弹出去暂停
         isPlay = videoView.onActivityStop();
         danmuFragment.pause();
     }
-    public void destroy(){
+
+    public void destroy() {
         videoView.destroy();
         questionView.hide();
         auditionView.hide();
