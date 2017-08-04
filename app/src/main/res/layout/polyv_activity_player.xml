@@ -97,7 +97,10 @@
             android:id="@+id/polyv_auxiliary_video_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/black"/>
+            android:background="@android:color/black"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <!-- 广告片头在加载过程中显示的进度条 -->
         <ProgressBar

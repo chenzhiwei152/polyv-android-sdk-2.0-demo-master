@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.easefun.polyvsdk.R;
 import com.easefun.polyvsdk.bean.PolyvUploadInfo;
 import com.easefun.polyvsdk.database.PolyvUploadSQLiteHelper;
+import com.easefun.polyvsdk.sub.auxilliary.LogUtil;
 import com.easefun.polyvsdk.upload.IPolyvUploader;
 import com.easefun.polyvsdk.upload.PolyvUploader;
 import com.easefun.polyvsdk.upload.PolyvUploaderManager;
@@ -176,6 +177,7 @@ public class PolyvUploadListViewAdapter extends BaseAdapter {
                 Message message = myHandler.obtainMessage(SUCCESS);
                 message.arg1 = position;
                 myHandler.sendMessage(message);
+                LogUtil.e(vid);
             }
         }
     }

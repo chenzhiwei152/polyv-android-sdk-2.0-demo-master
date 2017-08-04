@@ -12,6 +12,7 @@
 
 
     <ImageView
+        android:id="@+id/iv_null"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:src="@color/top_left_layout_color_black_alpha" />
